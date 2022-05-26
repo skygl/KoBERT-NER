@@ -35,7 +35,7 @@ class Trainer(object):
         self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
 
         # GPU or CPU
-        self.device = "cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu"
+        self.device = f"cuda:{args.cuda_number}" if torch.cuda.is_available() and not args.no_cuda else "cpu"
         self.model.to(self.device)
 
         self.test_texts = None
