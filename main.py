@@ -38,8 +38,8 @@ if __name__ == '__main__':
     parser.add_argument("--data_dir", default="./data", type=str, help="The input data dir")
     parser.add_argument("--pred_dir", default="./preds", type=str, help="The prediction file dir")
 
-    parser.add_argument("--train_file", default="train.tsv", type=str, help="Train file")
-    parser.add_argument("--test_file", default="test.tsv", type=str, help="Test file")
+    parser.add_argument("--train_file", default="train.txt", type=str, help="Train file")
+    parser.add_argument("--test_file", default="test.txt", type=str, help="Test file")
     parser.add_argument("--label_file", default="label.txt", type=str, help="Slot Label file")
     parser.add_argument("--write_pred", action="store_true", help="Write prediction during evaluation")
 
