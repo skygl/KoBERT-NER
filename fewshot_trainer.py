@@ -32,14 +32,12 @@ class FewShotTrainer(Trainer):
         train_dataloader = get_loader(train_path, tokenizer, trainN, K, Q, batch_size, max_length, use_sampled_data=False)
         valid_path = os.path.join(self.args.data_dir, 'valid.txt')
         valid_dataloader = get_loader(valid_path, tokenizer, N, K, Q, batch_size, max_length, use_sampled_data=False)
-        test_path = os.path.join(self.args.data_dir, 'test.txt')
-        test_dataloader = get_loader(test_path, tokenizer, N, K, Q, batch_size, max_length, use_sampled_data=False)
 
         prefix = '-'.join([str(N), str(K), 'seed'+str(self.args.seed)])
 
         model = Proto(self.word_encoder)
 
-        framework = FewShotNERFramework(train_dataloader, valid_dataloader, test_dataloader, use_sampled_data=False)
+        framework = FewShotNERFramework(train_dataloader, valid_dataloader, None, use_sampled_data=False)
 
         if not os.path.exists('checkpoint'):
             os.mkdir('checkpoint')
@@ -71,7 +69,7 @@ class FewShotTrainer(Trainer):
         tokenizer = load_tokenizer(self.args)
 
         test_path = os.path.join(self.args.data_dir, 'test.txt')
-        test_dataloader = get_loader(test_path, tokenizer, N, K, Q, batch_size, max_length)
+        test_dataloader = get_loader(test_path, tokenizer, N, K, Q, batch_size, max_length, use_sampled_data=False)
 
         model = Proto(self.word_encoder)
         framework = FewShotNERFramework(None, None, test_dataloader, use_sampled_data=False)

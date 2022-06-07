@@ -489,10 +489,8 @@ class FewShotNERFramework:
                     precision = correct_cnt / pred_cnt
                     recall = correct_cnt / label_cnt
                     f1 = 2 * precision * recall / (precision + recall)
-                    sys.stdout.write(
-                        'step: {0:4} | loss: {1:2.6f} | [ENTITY] precision: {2:3.4f}, recall: {3:3.4f}, f1: {4:3.4f}' \
-                        .format(it + 1, iter_loss / iter_sample, precision, recall, f1) + '\r')
-                sys.stdout.flush()
+                    print('step: {0:4} | loss: {1:2.6f} | [ENTITY] precision: {2:3.4f}, recall: {3:3.4f}, f1: {4:3.4f}' \
+                          .format(it + 1, iter_loss / iter_sample, precision, recall, f1) + '\r')
 
                 if (it + 1) % val_step == 0:
                     _, _, f1, _, _, _, _ = self.eval(model, val_iter)
