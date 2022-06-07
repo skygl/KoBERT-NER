@@ -46,6 +46,7 @@ class FewShotTrainer(Trainer):
         print('model-save-path: ', ckpt)
 
         if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
             os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
             model.cuda()
 
@@ -75,6 +76,7 @@ class FewShotTrainer(Trainer):
         framework = FewShotNERFramework(None, None, test_dataloader, use_sampled_data=False)
 
         if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
             os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
             model.cuda()
 
