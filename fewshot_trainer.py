@@ -47,7 +47,8 @@ class FewShotTrainer(Trainer):
         ckpt = 'checkpoint/{}.pth.tar'.format(prefix)
         print('model-save-path: ', ckpt)
 
-        if torch.cuda.is_available():
+        if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.cuda_number
             model.cuda()
 
         framework.train(model, prefix, save_ckpt=ckpt, train_iter=self.args.train_iter,
@@ -74,6 +75,10 @@ class FewShotTrainer(Trainer):
 
         model = Proto(self.word_encoder)
         framework = FewShotNERFramework(None, None, test_dataloader, use_sampled_data=False)
+
+        if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.cuda_number
+            model.cuda()
 
         precision, recall, f1, fp, fn, within, outer = framework.eval(model, self.args.test_iter, ckpt=ckpt)
         print("RESULT: precision: %.4f, recall: %.4f, f1:%.4f" % (precision, recall, f1))
