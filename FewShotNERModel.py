@@ -459,7 +459,6 @@ class FewShotNERFramework:
         it = 0
         while it + 1 < train_iter:
             for _, (support, query) in enumerate(self.train_data_loader):
-                print(it)
                 label = torch.cat(query['label'], 0)
                 if torch.cuda.is_available():
                     for k in support:

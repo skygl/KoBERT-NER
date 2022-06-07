@@ -48,7 +48,7 @@ class FewShotTrainer(Trainer):
         print('model-save-path: ', ckpt)
 
         if torch.cuda.is_available() and not self.args.no_cuda:
-            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.cuda_number
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
             model.cuda()
 
         framework.train(model, prefix, save_ckpt=ckpt, train_iter=self.args.train_iter,
@@ -77,7 +77,7 @@ class FewShotTrainer(Trainer):
         framework = FewShotNERFramework(None, None, test_dataloader, use_sampled_data=False)
 
         if torch.cuda.is_available() and not self.args.no_cuda:
-            os.environ["CUDA_VISIBLE_DEVICES"] = self.args.cuda_number
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
             model.cuda()
 
         precision, recall, f1, fp, fn, within, outer = framework.eval(model, self.args.test_iter, ckpt=ckpt)
