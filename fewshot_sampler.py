@@ -72,7 +72,7 @@ class FewshotSampler:
         isvalid = False
         for class_name in class_count:
             if class_name not in target_classes:
-                return False
+                continue
             if class_count[class_name] + set_class.get(class_name, 0) > threshold:
                 return False
             if set_class.get(class_name, 0) < set_class['k']:
@@ -102,40 +102,26 @@ class FewshotSampler:
         support_idx = []
         query_class = {'k': self.Q}
         query_idx = []
-        class_sample_count = 1
         target_classes = random.sample(self.classes, self.N)
         candidates = self.__get_candidates__(target_classes)
-        if class_sample_count % 200 == 0:
-            print("class sample count : ", class_sample_count)
         while not candidates:
-            class_sample_count += 1
             target_classes = random.sample(self.classes, self.N)
             candidates = self.__get_candidates__(target_classes)
-            if class_sample_count % 200 == 0:
-                print("class sample count : ", class_sample_count)
 
         # greedy search for support set
-        support_set_sample_count = 0
         while not self.__finish__(support_class):
             index = random.choice(candidates)
             if index not in support_idx:
                 if self.__valid_sample__(self.samples[index], support_class, target_classes):
                     self.__additem__(index, support_class)
                     support_idx.append(index)
-                support_set_sample_count += 1
-                if support_set_sample_count % 200 == 0:
-                    print("support set sample count : ", support_set_sample_count)
         # same for query set
-        query_set_sample_count = 0
         while not self.__finish__(query_class):
             index = random.choice(candidates)
             if index not in query_idx and index not in support_idx:
                 if self.__valid_sample__(self.samples[index], query_class, target_classes):
                     self.__additem__(index, query_class)
                     query_idx.append(index)
-                query_set_sample_count += 1
-                if query_set_sample_count % 100 == 0:
-                    print("query set sample count : ", query_set_sample_count)
         return target_classes, support_idx, query_idx
 
     def __iter__(self):
