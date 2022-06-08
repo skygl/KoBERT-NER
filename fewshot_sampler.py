@@ -130,6 +130,7 @@ class FewshotSampler:
 
         # same for query set
         stack = 1
+        total_stack = 1
         while not self.__finish__(query_class):
             index = random.choice(candidates)
             if index not in query_idx and index not in support_idx:
@@ -138,7 +139,8 @@ class FewshotSampler:
                     query_idx.append(index)
                 else:
                     stack += 1
-            if stack == max_stack * 50:
+                    total_stack += 1
+            if total_stack == max_stack * 50:
                 break
             if stack == max_stack:
                 query_idx = []
