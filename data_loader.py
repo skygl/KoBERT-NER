@@ -355,13 +355,16 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
             lines = f.readlines()
         samplelines = []
         index = 0
+        total_class_count = {}
         for line in tqdm(lines):
             line = line.strip()
             if line:
                 samplelines.append(line)
             else:
                 sample = Sample(samplelines)
-                self.set_sample_class_count(sample)
+                class_count = self.set_sample_class_count(sample)
+                for cls in class_count:
+                    total_class_count[cls] = total_class_count.get(cls, 0) + class_count[cls]
                 samples.append(sample)
                 sample_classes = sample.get_tag_class()
                 self.__insert_sample__(index, sample_classes)
@@ -370,6 +373,9 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
                 index += 1
         if samplelines:
             sample = Sample(samplelines)
+            class_count = self.set_sample_class_count(sample)
+            for cls in class_count:
+                total_class_count[cls] = total_class_count.get(cls, 0) + class_count[cls]
             samples.append(sample)
             sample_classes = sample.get_tag_class()
             self.__insert_sample__(index, sample_classes)
@@ -377,6 +383,7 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
             samplelines = []
             index += 1
         classes = list(set(classes))
+        print(total_class_count)
         return samples, classes
 
     def set_sample_class_count(self, sample):
