@@ -611,6 +611,13 @@ class FewShotNERFramework:
                     within_cnt += within
                     total_span_cnt += total_span
 
+                    if (it + 1) % 100 == 0:
+                        precision = correct_cnt / pred_cnt
+                        recall = correct_cnt / label_cnt
+                        f1 = 2 * precision * recall / (precision + recall)
+                        print('[EVAL] step: {0:4} | [ENTITY] precision: {1:3.4f}, recall: {2:3.4f}, f1: {3:3.4f}' \
+                              .format(it + 1, precision, recall, f1) + '\r')
+
                     if it + 1 == eval_iter:
                         break
                     it += 1
@@ -622,11 +629,11 @@ class FewShotNERFramework:
             fn_error = fn_cnt / total_token_cnt
             within_error = within_cnt / total_span_cnt
             outer_error = outer_cnt / total_span_cnt
-            sys.stdout.write(
-                '[EVAL] step: {0:4} | [ENTITY] precision: {1:3.4f}, recall: {2:3.4f}, f1: {3:3.4f}'.format(it + 1,
+            print()
+            print(
+                '[EVAL] TOTAL | [ENTITY] precision: {1:3.4f}, recall: {2:3.4f}, f1: {3:3.4f}'.format(it + 1,
                                                                                                            precision,
                                                                                                            recall,
                                                                                                            f1) + '\r')
-            sys.stdout.flush()
             print("")
         return precision, recall, f1, fp_error, fn_error, within_error, outer_error
