@@ -23,6 +23,10 @@ class FewShotTrainer(Trainer):
         batch_size = self.args.train_batch_size
         max_length = self.args.max_seq_len
 
+        if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
+
         print("{}-way-{}-shot Few-Shot NER".format(N, K))
         print("max_length: {}".format(max_length))
 
@@ -46,8 +50,6 @@ class FewShotTrainer(Trainer):
         print('model-save-path: ', ckpt)
 
         if torch.cuda.is_available() and not self.args.no_cuda:
-            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-            os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
             model.cuda()
 
         framework.train(model, prefix, save_ckpt=ckpt, train_iter=self.args.train_iter,
@@ -63,6 +65,10 @@ class FewShotTrainer(Trainer):
         Q = self.args.Q
         batch_size = self.args.train_batch_size
         max_length = self.args.max_seq_len
+
+        if torch.cuda.is_available() and not self.args.no_cuda:
+            os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+            os.environ["CUDA_VISIBLE_DEVICES"] = str(self.args.cuda_number)
 
         prefix = '-'.join([str(N), str(K), 'seed'+str(self.args.seed)])
         ckpt = 'checkpoint/{}.pth.tar'.format(prefix)
