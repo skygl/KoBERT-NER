@@ -335,8 +335,8 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
         self.K = K
         self.Q = Q
         self.tokenizer = tokenizer
-        self.samples, self.classes = self.__load_data_from_file__(filepath)
         self.max_length = max_length
+        self.samples, self.classes = self.__load_data_from_file__(filepath)
         self.sampler = FewshotSampler(N, K, Q, self.samples, classes=self.classes)
         self.ignore_label_id = ignore_label_id
 
