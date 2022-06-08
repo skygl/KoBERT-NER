@@ -72,7 +72,7 @@ class FewshotSampler:
         isvalid = False
         for class_name in class_count:
             if class_name not in target_classes:
-                continue
+                return False
             if class_count[class_name] + set_class.get(class_name, 0) > threshold:
                 return False
             if set_class.get(class_name, 0) < set_class['k']:
@@ -109,19 +109,37 @@ class FewshotSampler:
             candidates = self.__get_candidates__(target_classes)
 
         # greedy search for support set
+        max_stack = 100000
+
+        stack = 1
         while not self.__finish__(support_class):
             index = random.choice(candidates)
             if index not in support_idx:
                 if self.__valid_sample__(self.samples[index], support_class, target_classes):
                     self.__additem__(index, support_class)
                     support_idx.append(index)
+                else:
+                    stack += 1
+
+            if stack == max_stack:
+                support_idx = []
+                support_class = {'k': self.K}
+
         # same for query set
+        stack = 1
         while not self.__finish__(query_class):
             index = random.choice(candidates)
             if index not in query_idx and index not in support_idx:
                 if self.__valid_sample__(self.samples[index], query_class, target_classes):
                     self.__additem__(index, query_class)
                     query_idx.append(index)
+                else:
+                    stack += 1
+
+            if stack == max_stack:
+                query_idx = []
+                query_class = {'k': self.Q}
+
         return target_classes, support_idx, query_idx
 
     def __iter__(self):
