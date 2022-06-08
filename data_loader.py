@@ -313,9 +313,8 @@ class Sample(FewshotSampleBase):
         return tag_class
 
     def valid(self, target_classes):
-        # 앞의 항 : 문장이 target class에 해당하는 클래스 토큰을 가지고 있음
-        # 뒤의 항 (삭제) : 문장이 target class 이외 클래스 토큰을 가지고 있지 않아야 함
-        return set(self.get_class_count().keys()).intersection(set(target_classes))
+        return (set(self.get_class_count().keys()).intersection(set(target_classes))) and not (
+            set(self.get_class_count().keys()).difference(set(target_classes)))
 
     def __str__(self):
         newlines = zip(self.words, self.tags)
@@ -508,11 +507,7 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
         target_classes, support_idx, query_idx = self.sampler.__next__()
         # add 'O' and make sure 'O' is labeled 0
         distinct_tags = ['O'] + target_classes
-        o_tag_idx = 0
         self.tag2label = {tag: idx for idx, tag in enumerate(distinct_tags)}
-        # 타겟 클래스가 아닌 클래스들을 모두 O 태그로 치환
-        for not_target_tag in (set(self.classes) - set(target_classes)):
-            self.tag2label[not_target_tag] = o_tag_idx
         self.label2tag = {idx: tag for idx, tag in enumerate(distinct_tags)}
         support_set = self.__populate__(support_idx)
         query_set = self.__populate__(query_idx, savelabeldic=True)
@@ -588,11 +583,7 @@ class FewShotNERDataset(FewShotNERDatasetWithRandomSampling):
         query = sample['query']
         # add 'O' and make sure 'O' is labeled 0
         distinct_tags = ['O'] + target_classes
-        o_tag_idx = 0
         self.tag2label = {tag: idx for idx, tag in enumerate(distinct_tags)}
-        # 타겟 클래스가 아닌 클래스들을 모두 O 태그로 치환
-        for not_target_tag in (set(self.classes) - set(target_classes)):
-            self.tag2label[not_target_tag] = o_tag_idx
         self.label2tag = {idx: tag for idx, tag in enumerate(distinct_tags)}
         support_set = self.__populate__(support)
         query_set = self.__populate__(query, savelabeldic=True)
