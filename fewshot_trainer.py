@@ -54,7 +54,7 @@ class FewShotTrainer(Trainer):
 
         framework.train(model, prefix, save_ckpt=ckpt, train_iter=self.args.train_iter,
                         warmup_step=int(self.args.train_iter * 0.1), val_iter=self.args.valid_iter,
-                        learning_rate=self.args.learning_rate)
+                        learning_rate=self.args.learning_rate, val_step=self.args.val_step)
 
     def load_model(self):
         pass
