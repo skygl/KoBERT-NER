@@ -138,7 +138,8 @@ class FewshotSampler:
                     query_idx.append(index)
                 else:
                     stack += 1
-
+            if stack == max_stack * 50:
+                break
             if stack == max_stack:
                 query_idx = []
                 query_class = {'k': self.Q}
