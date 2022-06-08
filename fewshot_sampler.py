@@ -72,7 +72,7 @@ class FewshotSampler:
         isvalid = False
         for class_name in class_count:
             if class_name not in target_classes:
-                return False
+                continue
             if class_count[class_name] + set_class.get(class_name, 0) > threshold:
                 return False
             if set_class.get(class_name, 0) < set_class['k']:
@@ -124,6 +124,7 @@ class FewshotSampler:
             if stack == max_stack:
                 support_idx = []
                 support_class = {'k': self.K}
+                stack = 1
 
         # same for query set
         stack = 1
@@ -139,6 +140,7 @@ class FewshotSampler:
             if stack == max_stack:
                 query_idx = []
                 query_class = {'k': self.Q}
+                stack = 1
 
         return target_classes, support_idx, query_idx
 

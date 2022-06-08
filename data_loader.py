@@ -313,8 +313,9 @@ class Sample(FewshotSampleBase):
         return tag_class
 
     def valid(self, target_classes):
-        return (set(self.get_class_count().keys()).intersection(set(target_classes))) and not (
-            set(self.get_class_count().keys()).difference(set(target_classes)))
+        # 앞의 항 : 문장이 target class에 해당하는 클래스 토큰을 가지고 있음
+        # 뒤의 항 (삭제) : 문장이 target class 이외 클래스 토큰을 가지고 있지 않아야 함
+        return set(self.get_class_count().keys()).intersection(set(target_classes))
 
     def __str__(self):
         newlines = zip(self.words, self.tags)
