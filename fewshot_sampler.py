@@ -56,9 +56,11 @@ class FewshotSampler:
                     '[ERROR] samples in self.samples expected to have `get_class_count` attribute, but self.samples[{idx}] does not')
                 raise ValueError
 
-    def __additem__(self, index, set_class):
+    def __additem__(self, index, set_class, target_classes):
         class_count = self.samples[index].get_class_count()
         for class_name in class_count:
+            if class_name not in target_classes:
+                continue
             if class_name in set_class:
                 set_class[class_name] += class_count[class_name]
             else:
@@ -116,7 +118,7 @@ class FewshotSampler:
             index = random.choice(candidates)
             if index not in support_idx:
                 if self.__valid_sample__(self.samples[index], support_class, target_classes):
-                    self.__additem__(index, support_class)
+                    self.__additem__(index, support_class, target_classes)
                     support_idx.append(index)
                 else:
                     stack += 1
@@ -132,7 +134,7 @@ class FewshotSampler:
             index = random.choice(candidates)
             if index not in query_idx and index not in support_idx:
                 if self.__valid_sample__(self.samples[index], query_class, target_classes):
-                    self.__additem__(index, query_class)
+                    self.__additem__(index, query_class, target_classes)
                     query_idx.append(index)
                 else:
                     stack += 1
