@@ -140,7 +140,7 @@ class FewshotSampler:
                 else:
                     stack += 1
                     total_stack += 1
-            if total_stack == max_stack * 50:
+            if total_stack == max_stack * 5:
                 break
             if stack == max_stack:
                 query_idx = []

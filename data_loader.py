@@ -6,7 +6,6 @@ import os
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, Dataset, DataLoader
-from tqdm import tqdm
 
 from fewshot_sampler import FewshotSampleBase, FewshotSampler
 from utils import get_labels, get_labels_from_path
@@ -356,7 +355,7 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
         samplelines = []
         index = 0
         total_class_count = {}
-        for line in tqdm(lines):
+        for line in lines:
             line = line.strip()
             if line:
                 samplelines.append(line)

@@ -6,7 +6,6 @@ from torch import nn
 from torch.nn import functional as F
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
-from tqdm import tqdm
 
 import data_loader
 from viterbi import ViterbiDecoder
@@ -587,7 +586,7 @@ class FewShotNERFramework:
         with torch.no_grad():
             it = 0
             while it + 1 < eval_iter:
-                for _, (support, query) in tqdm(enumerate(eval_dataset), total=eval_iter, initial=1):
+                for _, (support, query) in enumerate(eval_dataset):
                     label = torch.cat(query['label'], 0)
                     if torch.cuda.is_available():
                         for k in support:
