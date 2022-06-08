@@ -300,6 +300,10 @@ class Sample(FewshotSampleBase):
             self.__count_entities__()
             return self.class_count
 
+    def set_class_count(self, class_count):
+        self.class_count = class_count
+        return self.class_count
+
     def get_tag_class(self):
         # strip 'B' 'I'
         tag_class = list(set(self.normalized_tags))
@@ -356,6 +360,7 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
                 samplelines.append(line)
             else:
                 sample = Sample(samplelines)
+                self.set_sample_class_count(sample)
                 samples.append(sample)
                 sample_classes = sample.get_tag_class()
                 self.__insert_sample__(index, sample_classes)
@@ -372,6 +377,45 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
             index += 1
         classes = list(set(classes))
         return samples, classes
+
+    def set_sample_class_count(self, sample):
+        def count_entity(normalized_tags):
+            class_count = {}
+            current_tag = normalized_tags[0]
+            for tag in normalized_tags[1:]:
+                if tag == current_tag:
+                    continue
+                else:
+                    if current_tag != 'O':
+                        if current_tag in class_count:
+                            class_count[current_tag] += 1
+                        else:
+                            class_count[current_tag] = 1
+                    current_tag = tag
+            if current_tag != 'O':
+                if current_tag in class_count:
+                    class_count[current_tag] += 1
+                else:
+                    class_count[current_tag] = 1
+
+            return class_count
+
+        token_len = 0
+        labels = []
+        while token_len < self.max_length - 2:
+            for word, tag in zip(sample.words, sample.normalized_tags):
+                word_tokens = self.tokenizer.tokenize(word)
+                if word_tokens:
+                    token_len += len(word_tokens)
+                    labels.append(tag)
+                if token_len >= self.max_length - 2:
+                    break
+
+        normalized_labels = list(map(get_class_name, labels))
+        class_count_of_sample = count_entity(normalized_labels)
+        sample.set_class_count(class_count_of_sample)
+
+        return class_count_of_sample
 
     def __get_token_label_list__(self, sample):
         tokens = []
