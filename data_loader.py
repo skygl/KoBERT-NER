@@ -425,7 +425,7 @@ class FewShotNERDatasetWithRandomSampling(Dataset):
             if word_tokens:
                 tokens.extend(word_tokens)
                 # Use the real label id for the first token of the word, and padding ids for the remaining tokens
-                word_labels = [self.tag2label[tag]] + [self.ignore_label_id] * (len(word_tokens) - 1)
+                word_labels = [self.tag2label.get(tag, 0)] + [self.ignore_label_id] * (len(word_tokens) - 1)
                 labels.extend(word_labels)
         return tokens, labels
 
