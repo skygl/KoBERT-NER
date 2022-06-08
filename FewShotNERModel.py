@@ -6,6 +6,7 @@ from torch import nn
 from torch.nn import functional as F
 from torch.optim import AdamW
 from transformers import get_linear_schedule_with_warmup
+from tqdm import tqdm
 
 import data_loader
 from viterbi import ViterbiDecoder
@@ -586,7 +587,7 @@ class FewShotNERFramework:
         with torch.no_grad():
             it = 0
             while it + 1 < eval_iter:
-                for _, (support, query) in enumerate(eval_dataset):
+                for _, (support, query) in tqdm(enumerate(eval_dataset), total=eval_iter, initial=1):
                     label = torch.cat(query['label'], 0)
                     if torch.cuda.is_available():
                         for k in support:
@@ -610,13 +611,6 @@ class FewShotNERFramework:
                     outer_cnt += outer
                     within_cnt += within
                     total_span_cnt += total_span
-
-                    if (it + 1) % 100 == 0:
-                        precision = correct_cnt / pred_cnt
-                        recall = correct_cnt / label_cnt
-                        f1 = 2 * precision * recall / (precision + recall)
-                        print('[EVAL] step: {0:4} | [ENTITY] precision: {1:3.4f}, recall: {2:3.4f}, f1: {3:3.4f}' \
-                              .format(it + 1, precision, recall, f1) + '\r')
 
                     if it + 1 == eval_iter:
                         break
