@@ -236,13 +236,7 @@ class Trainer(object):
             if self.args.task == 'naver-ner':
                 self.model = self.model_class.from_pretrained(self.args.model_dir)
             else:
-                self.model = self.model_class.from_pretrained(self.args.model_name_or_path,
-                                                              dataset_label_nums=[len(self.label_lst)],
-                                                              output_attentions=False,
-                                                              output_hidden_states=False)
-                state = torch.load(self.args.model_dir)
-                print(state)
-                self.model.module.load_state_dict(state['state_dict'])
+                self.model = torch.load(self.args.model_dir)
             self.model.to(self.device)
             logger.info("***** Model Loaded *****")
         except:
