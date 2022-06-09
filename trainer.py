@@ -242,7 +242,7 @@ class Trainer(object):
                                                               output_hidden_states=False)
                 state = torch.load(self.args.model_dir)
                 print(state)
-                self.model.load_state_dict(state['state_dict'])
+                self.model.module.load_state_dict(state['state_dict'])
             self.model.to(self.device)
             logger.info("***** Model Loaded *****")
         except:
