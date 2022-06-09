@@ -243,9 +243,6 @@ class Trainer(object):
             else:
                 pre_model = self.model
                 self.model = torch.load(self.args.model_dir)
-                print(pre_model.classifiers[0].weight == self.model.classifiers[0].weight)
-                print(pre_model.classifiers[0][0])
-                print(self.model.classifiers[0][0])
             self.model.to(self.device)
             logger.info("***** Model Loaded *****")
         except:
