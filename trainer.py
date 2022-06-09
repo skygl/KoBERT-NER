@@ -236,12 +236,12 @@ class Trainer(object):
             if self.args.task == 'naver-ner':
                 self.model = self.model_class.from_pretrained(self.args.model_dir)
             else:
+                self.model = self.model_class.from_pretrained(self.args.model_name_or_path,
+                                                              dataset_label_nums=[len(self.label_lst)],
+                                                              output_attentions=False,
+                                                              output_hidden_states=False)
                 state = torch.load(self.args.model_dir)
                 self.model.load_state_dict(state['state_dict'])
-                # self.model = self.model_class.from_pretrained(self.args.model_name_or_path,
-                #                                               dataset_label_nums=[len(self.label_lst)],
-                #                                               output_attentions=False,
-                #                                               output_hidden_states=False)
                 # pretrained_dict = state.state_dict()
                 # model_dict = self.model.state_dict()
                 # pretrained_dict = {k: v for k, v in pretrained_dict.items() if
