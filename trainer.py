@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import AdamW, get_linear_schedule_with_warmup
 
 from utils import compute_metrics, get_labels, get_test_texts, show_report, MODEL_CLASSES, get_labels_from_path
-from finetuned_model import BertNER
+from finetune_model import BertNER
 
 logger = logging.getLogger(__name__)
 
