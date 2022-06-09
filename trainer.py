@@ -173,7 +173,14 @@ class Trainer(object):
                 else:
                     tmp_eval_loss, o, logits = outputs
                     if nb_eval_steps % 10 == 0:
-                        print(o[:10])
+                        p_tmp = logits.detach().cpu().numpy()
+                        o_hat = np.argmax(p_tmp, axis=2)
+                        print("predicted")
+                        print(o_hat[:5])
+                        print("inside predicted")
+                        print(o[:5])
+                        print("label")
+                        print(inputs['labels'][:5])
 
                 eval_loss += tmp_eval_loss.mean().item()
             nb_eval_steps += 1
