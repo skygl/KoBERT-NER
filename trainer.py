@@ -163,7 +163,7 @@ class Trainer(object):
                 inputs = {'input_ids': batch[0],
                           'attention_mask': batch[1],
                           'labels': batch[3]}
-                if self.args.model_type != 'distilkobert' or self.args.task != 'few-shot':
+                if self.args.model_type != 'distilkobert' and self.args.task != 'few-shot':
                     inputs['token_type_ids'] = batch[2]
                 outputs = self.model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
