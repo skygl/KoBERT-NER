@@ -15,7 +15,7 @@ def main(args):
     dev_dataset = None
     test_dataset = None
 
-    if args.task == 'naver-ner':
+    if args.task == 'naver-ner' or args.task == 'few-shot':
         tokenizer = load_tokenizer(args)
 
         if args.do_train or args.do_eval:
@@ -83,7 +83,12 @@ if __name__ == '__main__':
     parser.add_argument('--test_iter', default=500, type=int, help='num of iters in training')
     parser.add_argument('--val_step', default=20, type=int, help='val after training how many iters')
 
+    # Few-Shot
+    parser.add_argument('--model_name_or_path', default='monologg/kobert', type=str, help='model name or path to initialize')
+
     args = parser.parse_args()
 
-    args.model_name_or_path = MODEL_PATH_MAP[args.model_type]
+    if args.task != 'few-shot':
+        args.model_name_or_path = MODEL_PATH_MAP[args.model_type]
+
     main(args)
