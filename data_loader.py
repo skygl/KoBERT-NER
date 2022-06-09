@@ -132,6 +132,7 @@ class FewShotProcessor(object):
 
 processors = {
     "naver-ner": NaverNerProcessor,
+    "few-shot": NaverNerProcessor,
     "fsl": FewShotProcessor,
 }
 
