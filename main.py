@@ -83,12 +83,8 @@ if __name__ == '__main__':
     parser.add_argument('--test_iter', default=500, type=int, help='num of iters in training')
     parser.add_argument('--val_step', default=20, type=int, help='val after training how many iters')
 
-    # Few-Shot
-    parser.add_argument('--model_name_or_path', default='monologg/kobert', type=str, help='model name or path to initialize')
-
     args = parser.parse_args()
 
-    if args.task != 'few-shot':
-        args.model_name_or_path = MODEL_PATH_MAP[args.model_type]
+    args.model_name_or_path = MODEL_PATH_MAP[args.model_type]
 
     main(args)

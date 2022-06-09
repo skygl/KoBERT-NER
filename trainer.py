@@ -40,7 +40,7 @@ class Trainer(object):
                 self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
             else:
                 self.model_class = BertNER
-                self.model = self.model_class.from_pretrained(args.model_name_or_path,
+                self.model = self.model_class.from_pretrained(args.model_dir,
                                                               dataset_label_nums=[len(self.label_lst)],
                                                               output_attentions=False,
                                                               output_hidden_states=False)
