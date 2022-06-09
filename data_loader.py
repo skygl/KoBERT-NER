@@ -69,6 +69,7 @@ class NaverNerProcessor(object):
     def __init__(self, args):
         self.args = args
         self.labels_lst = get_labels(args)
+        print("labels_lst : ", self.labels_lst)
 
     @classmethod
     def _read_file(cls, input_file):
