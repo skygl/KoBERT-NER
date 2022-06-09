@@ -172,7 +172,6 @@ class Trainer(object):
                     tmp_eval_loss, logits = outputs[:2]
                 else:
                     tmp_eval_loss, _, logits = outputs
-                print(logits.shape)
 
                 eval_loss += tmp_eval_loss.mean().item()
             nb_eval_steps += 1
