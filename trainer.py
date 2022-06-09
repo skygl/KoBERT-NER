@@ -171,7 +171,9 @@ class Trainer(object):
                 if self.args.task == 'naver-ner':
                     tmp_eval_loss, logits = outputs[:2]
                 else:
-                    tmp_eval_loss, _, logits = outputs
+                    tmp_eval_loss, o, logits = outputs
+                    if nb_eval_steps % 10 == 0:
+                        print(o[:10])
 
                 eval_loss += tmp_eval_loss.mean().item()
             nb_eval_steps += 1
