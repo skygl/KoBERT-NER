@@ -241,13 +241,8 @@ class Trainer(object):
                                                               output_attentions=False,
                                                               output_hidden_states=False)
                 state = torch.load(self.args.model_dir)
+                print(state)
                 self.model.load_state_dict(state['state_dict'])
-                # pretrained_dict = state.state_dict()
-                # model_dict = self.model.state_dict()
-                # pretrained_dict = {k: v for k, v in pretrained_dict.items() if
-                #                    k in model_dict and 'classifiers.0.' not in k}
-                # model_dict.update(pretrained_dict)
-                # self.model.load_state_dict(model_dict)
             self.model.to(self.device)
             logger.info("***** Model Loaded *****")
         except:
