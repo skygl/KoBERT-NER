@@ -165,8 +165,13 @@ class Trainer(object):
                           'labels': batch[3]}
                 if self.args.model_type != 'distilkobert' and self.args.task != 'few-shot':
                     inputs['token_type_ids'] = batch[2]
+                if self.args.task == 'few-shot':
+                    inputs['output_logits'] = True
                 outputs = self.model(**inputs)
-                tmp_eval_loss, logits = outputs[:2]
+                if self.args.task == 'naver-ner':
+                    tmp_eval_loss, logits = outputs[:2]
+                else:
+                    tmp_eval_loss, _, logits = outputs
                 print(logits.shape)
 
                 eval_loss += tmp_eval_loss.mean().item()
