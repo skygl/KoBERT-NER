@@ -167,6 +167,7 @@ class Trainer(object):
                     inputs['token_type_ids'] = batch[2]
                 outputs = self.model(**inputs)
                 tmp_eval_loss, logits = outputs[:2]
+                print(logits.shape)
 
                 eval_loss += tmp_eval_loss.mean().item()
             nb_eval_steps += 1
