@@ -1,26 +1,32 @@
 import argparse
+import os
 
+from fewshot_trainer import FewShotTrainer
 from trainer import Trainer
 from utils import init_logger, load_tokenizer, set_seed, MODEL_CLASSES, MODEL_PATH_MAP
-from data_loader import load_and_cache_examples
+from data_loader import load_and_cache_examples, get_loader
 
 
 def main(args):
     init_logger()
     set_seed(args)
-    
-    tokenizer = load_tokenizer(args)
 
     train_dataset = None
     dev_dataset = None
     test_dataset = None
 
-    if args.do_train or args.do_eval:
-        test_dataset = load_and_cache_examples(args, tokenizer, mode="test")
-    if args.do_train:
-        train_dataset = load_and_cache_examples(args, tokenizer, mode="train")
+    if args.task == 'naver-ner':
+        tokenizer = load_tokenizer(args)
 
-    trainer = Trainer(args, train_dataset, dev_dataset, test_dataset)
+        if args.do_train or args.do_eval:
+            test_dataset = load_and_cache_examples(args, tokenizer, mode="test")
+        if args.do_train:
+            train_dataset = load_and_cache_examples(args, tokenizer, mode="train")
+
+        trainer = Trainer(args, train_dataset, dev_dataset, test_dataset)
+
+    elif args.task == 'fsl':
+        trainer = FewShotTrainer(args, train_dataset, dev_dataset, test_dataset)
 
     if args.do_train:
         trainer.train()
@@ -66,6 +72,16 @@ if __name__ == '__main__':
     parser.add_argument("--do_eval", action="store_true", help="Whether to run eval on the test set.")
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
     parser.add_argument('--cuda_number', type=int, default=0, help="number of CUDA to use")
+
+    # Reference : https://github.com/thunlp/Few-NERD
+    parser.add_argument('--trainN', default=2, type=int, help='N in train')
+    parser.add_argument('--N', default=2, type=int, help='N way')
+    parser.add_argument('--K', default=2, type=int, help='K shot')
+    parser.add_argument('--Q', default=3, type=int, help='Num of query per class')
+    parser.add_argument('--train_iter', default=600, type=int, help='num of iters in training')
+    parser.add_argument('--valid_iter', default=100, type=int, help='num of iters in training')
+    parser.add_argument('--test_iter', default=500, type=int, help='num of iters in training')
+    parser.add_argument('--val_step', default=20, type=int, help='val after training how many iters')
 
     args = parser.parse_args()
 

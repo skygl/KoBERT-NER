@@ -8,7 +8,7 @@ import torch
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import AdamW, get_linear_schedule_with_warmup
 
-from utils import compute_metrics, get_labels, get_test_texts, show_report, MODEL_CLASSES
+from utils import compute_metrics, get_labels, get_test_texts, show_report, MODEL_CLASSES, get_labels_from_path
 
 logger = logging.getLogger(__name__)
 
@@ -22,28 +22,30 @@ class Trainer(object):
 
         self.label_lst = get_labels(args)
         self.num_labels = len(self.label_lst)
-        # Use cross entropy ignore index as padding label id so that only real label ids contribute to the loss later
-        self.pad_token_label_id = torch.nn.CrossEntropyLoss().ignore_index
 
-        self.config_class, self.model_class, _ = MODEL_CLASSES[args.model_type]
+        if args.task == 'naver-ner':
+            # Use cross entropy ignore index as padding label id so that only real label ids contribute to the loss later
+            self.pad_token_label_id = torch.nn.CrossEntropyLoss().ignore_index
 
-        self.config = self.config_class.from_pretrained(args.model_name_or_path,
-                                                        num_labels=self.num_labels,
-                                                        finetuning_task=args.task,
-                                                        id2label={str(i): label for i, label in enumerate(self.label_lst)},
-                                                        label2id={label: i for i, label in enumerate(self.label_lst)})
-        self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
+            self.config_class, self.model_class, _ = MODEL_CLASSES[args.model_type]
 
-        # GPU or CPU
-        self.device = f"cuda:{args.cuda_number}" if torch.cuda.is_available() and not args.no_cuda else "cpu"
-        self.model.to(self.device)
+            self.config = self.config_class.from_pretrained(args.model_name_or_path,
+                                                            num_labels=self.num_labels,
+                                                            finetuning_task=args.task,
+                                                            id2label={str(i): label for i, label in enumerate(self.label_lst)},
+                                                            label2id={label: i for i, label in enumerate(self.label_lst)})
+            self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
 
-        self.test_texts = None
-        if args.write_pred:
-            self.test_texts = get_test_texts(args)
-            # Empty the original prediction files
-            if os.path.exists(args.pred_dir):
-                shutil.rmtree(args.pred_dir)
+            # GPU or CPU
+            self.device = f"cuda:{args.cuda_number}" if torch.cuda.is_available() and not args.no_cuda else "cpu"
+            self.model.to(self.device)
+
+            self.test_texts = None
+            if args.write_pred:
+                self.test_texts = get_test_texts(args)
+                # Empty the original prediction files
+                if os.path.exists(args.pred_dir):
+                    shutil.rmtree(args.pred_dir)
 
     def train(self):
         train_sampler = RandomSampler(self.train_dataset)

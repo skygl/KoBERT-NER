@@ -52,6 +52,10 @@ def get_labels(args):
     return [label.strip() for label in open(os.path.join(args.data_dir, args.label_file), 'r', encoding='utf-8')]
 
 
+def get_labels_from_path(path):
+    return [label.strip() for label in open(path, 'r', encoding='utf-8')]
+
+
 def load_tokenizer(args):
     return MODEL_CLASSES[args.model_type][2].from_pretrained(args.model_name_or_path)
 
