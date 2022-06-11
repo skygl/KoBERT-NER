@@ -77,6 +77,14 @@ class Trainer(object):
         train_sampler = RandomSampler(self.train_dataset)
         train_dataloader = DataLoader(self.train_dataset, sampler=train_sampler, batch_size=self.args.train_batch_size)
 
+        unsup_batch_per_train = 0
+        if self.args.do_self_train:
+            unsup_sampler = RandomSampler(self.unsup_dataset)
+            unsup_dataloader = DataLoader(self.unsup_dataset, sampler=unsup_sampler,
+                                          batch_size=self.args.train_batch_size)
+            unsup_batch_per_train = max(1, len(unsup_dataloader) // len(train_dataloader))
+            unsup_iter = iter(unsup_dataloader)
+
         if self.args.max_steps > 0:
             t_total = self.args.max_steps
             self.args.num_train_epochs = self.args.max_steps // (len(train_dataloader) // self.args.gradient_accumulation_steps) + 1
@@ -121,6 +129,23 @@ class Trainer(object):
                     inputs['token_type_ids'] = batch[2]
                 outputs = self.model(**inputs)
                 loss = outputs[0]
+
+                if self.args.do_self_train:
+                    unsup_loss = 0.0
+                    for _ in range(unsup_batch_per_train):
+                        self.model.train()
+                        unsup_batch = next(unsup_iter)
+                        unsup_batch = tuple(t.to(self.device) for t in unsup_batch)  # GPU or CPU
+                        unsup_inputs = {'input_ids': unsup_batch[0],
+                                        'attention_mask': unsup_batch[1],
+                                        'labels': unsup_batch[3]}
+                        if self.args.model_type != 'distilkobert':
+                            unsup_inputs['token_type_ids'] = unsup_batch[2]
+                        unsup_outputs = self.model(**unsup_inputs)
+                        unsup_loss += unsup_outputs[0]
+
+                    unsup_loss = unsup_loss / unsup_batch_per_train
+                    loss += unsup_loss
 
                 if self.args.gradient_accumulation_steps > 1:
                     loss = loss / self.args.gradient_accumulation_steps

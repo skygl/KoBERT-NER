@@ -117,6 +117,8 @@ class NaverNerProcessor(object):
             file_to_read = self.args.dev_file
         elif mode == 'test':
             file_to_read = self.args.test_file
+        elif mode == 'unsup':
+            file_to_read = self.args.unsup_file
 
         logger.info("LOOKING AT {}".format(os.path.join(self.args.data_dir, file_to_read)))
         return self._create_examples(self._read_file(os.path.join(self.args.data_dir, file_to_read)), mode)
@@ -242,6 +244,8 @@ def load_and_cache_examples(args, tokenizer, mode):
             examples = processor.get_examples("dev")
         elif mode == "test":
             examples = processor.get_examples("test")
+        elif mode == "unsup":
+            examples = processor.get_examples("unsup")
         else:
             raise Exception("For mode, Only train, dev, test is available")
 

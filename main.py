@@ -14,6 +14,7 @@ def main(args):
     train_dataset = None
     dev_dataset = None
     test_dataset = None
+    unsup_dataset = None
 
     if args.task == 'naver-ner' or args.task == 'few-shot':
         tokenizer = load_tokenizer(args)
@@ -22,8 +23,10 @@ def main(args):
             test_dataset = load_and_cache_examples(args, tokenizer, mode="test")
         if args.do_train:
             train_dataset = load_and_cache_examples(args, tokenizer, mode="train")
+        if args.do_self_train:
+            unsup_dataset = load_and_cache_examples(args, tokenizer, mode="unsup")
 
-        trainer = Trainer(args, train_dataset, dev_dataset, test_dataset)
+        trainer = Trainer(args, train_dataset, dev_dataset, test_dataset, unsup_dataset)
 
     elif args.task == 'fsl':
         trainer = FewShotTrainer(args, train_dataset, dev_dataset, test_dataset)
@@ -47,6 +50,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--train_file", default="train.txt", type=str, help="Train file")
     parser.add_argument("--test_file", default="test.txt", type=str, help="Test file")
+    parser.add_argument("--unsup_file", default="unsup.txt", type=str, help="Unsup file for Self-training")
     parser.add_argument("--label_file", default="label.txt", type=str, help="Slot Label file")
     parser.add_argument("--write_pred", action="store_true", help="Write prediction during evaluation")
 
@@ -71,6 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--save_steps', type=int, default=1000, help="Save checkpoint every X updates steps.")
 
     parser.add_argument("--do_train", action="store_true", help="Whether to run training.")
+    parser.add_argument("--do_self_train", action="store_true", help="Whether to run self-training.")
     parser.add_argument("--do_eval", action="store_true", help="Whether to run eval on the test set.")
     parser.add_argument("--no_cuda", action="store_true", help="Avoid using CUDA when available")
     parser.add_argument('--cuda_number', type=int, default=0, help="number of CUDA to use")
