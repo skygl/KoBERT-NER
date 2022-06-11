@@ -147,7 +147,11 @@ class Trainer(object):
                 if self.args.do_self_train:
                     for _ in range(unsup_batch_per_train):
                         self.model.train()
-                        unsup_batch = next(unsup_iter)
+                        try:
+                            unsup_batch = next(unsup_iter)
+                        except StopIteration:
+                            unsup_iter = iter(unsup_dataloader)
+                            unsup_batch = next(unsup_iter)
                         unsup_batch = tuple(t.to(self.device) for t in unsup_batch)  # GPU or CPU
                         unsup_inputs = {'input_ids': unsup_batch[0],
                                         'attention_mask': unsup_batch[1],
