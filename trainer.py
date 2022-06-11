@@ -137,8 +137,14 @@ class Trainer(object):
 
                 tr_loss += loss.item()
 
+                if (step + 1) % self.args.gradient_accumulation_steps == 0:
+                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
+
+                    optimizer.step()
+                    scheduler.step()  # Update learning rate schedule
+                    self.model.zero_grad()
+
                 if self.args.do_self_train:
-                    unsup_iter_loss = 0.0
                     for _ in range(unsup_batch_per_train):
                         self.model.train()
                         unsup_batch = next(unsup_iter)
@@ -150,18 +156,18 @@ class Trainer(object):
                             unsup_inputs['token_type_ids'] = unsup_batch[2]
                         unsup_outputs = self.model(**unsup_inputs)
                         unsup_loss = unsup_outputs[0]
-                        if self.args.gradient_accumulation_steps > 1:
-                            unsup_loss = unsup_loss / self.args.gradient_accumulation_steps
+
                         unsup_loss.backward()
 
-                        tr_loss += unsup_iter_loss
+                        torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
+
+                        optimizer.step()
+                        scheduler.step()  # Update learning rate schedule
+                        self.model.zero_grad()
+
+                        tr_loss += unsup_loss.item()
 
                 if (step + 1) % self.args.gradient_accumulation_steps == 0:
-                    torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
-
-                    optimizer.step()
-                    scheduler.step()  # Update learning rate schedule
-                    self.model.zero_grad()
                     global_step += 1
 
                     if self.args.logging_steps > 0 and global_step % self.args.logging_steps == 0:
