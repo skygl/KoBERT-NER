@@ -130,8 +130,15 @@ class Trainer(object):
                 outputs = self.model(**inputs)
                 loss = outputs[0]
 
+                if self.args.gradient_accumulation_steps > 1:
+                    loss = loss / self.args.gradient_accumulation_steps
+
+                loss.backward()
+
+                tr_loss += loss.item()
+
                 if self.args.do_self_train:
-                    unsup_loss = 0.0
+                    unsup_iter_loss = 0.0
                     for _ in range(unsup_batch_per_train):
                         self.model.train()
                         unsup_batch = next(unsup_iter)
@@ -142,17 +149,13 @@ class Trainer(object):
                         if self.args.model_type != 'distilkobert':
                             unsup_inputs['token_type_ids'] = unsup_batch[2]
                         unsup_outputs = self.model(**unsup_inputs)
-                        unsup_loss += unsup_outputs[0]
+                        unsup_loss = unsup_outputs[0]
+                        if self.args.gradient_accumulation_steps > 1:
+                            unsup_loss = unsup_loss / self.args.gradient_accumulation_steps
+                        unsup_loss.backward()
 
-                    unsup_loss = unsup_loss / unsup_batch_per_train
-                    loss += unsup_loss
+                        tr_loss += unsup_iter_loss
 
-                if self.args.gradient_accumulation_steps > 1:
-                    loss = loss / self.args.gradient_accumulation_steps
-
-                loss.backward()
-
-                tr_loss += loss.item()
                 if (step + 1) % self.args.gradient_accumulation_steps == 0:
                     torch.nn.utils.clip_grad_norm_(self.model.parameters(), self.args.max_grad_norm)
 
