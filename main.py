@@ -41,6 +41,7 @@ if __name__ == '__main__':
 
     parser.add_argument("--task", default="naver-ner", type=str, help="The name of the task to train")
     parser.add_argument("--model_dir", default="./model", type=str, help="Path to save, load model")
+    parser.add_argument("--pretrained_model_dir", default="./model/pre-train", type=str, help="Path to load pre-trained model")
     parser.add_argument("--data_dir", default="./data", type=str, help="The input data dir")
     parser.add_argument("--pred_dir", default="./preds", type=str, help="The prediction file dir")
 
@@ -50,6 +51,7 @@ if __name__ == '__main__':
     parser.add_argument("--write_pred", action="store_true", help="Write prediction during evaluation")
 
     parser.add_argument("--model_type", default="kobert", type=str, help="Model type selected in the list: " + ", ".join(MODEL_CLASSES.keys()))
+    parser.add_argument('--load_pretrained', action="store_true", help="Whether to load pre-trained model.")
 
     parser.add_argument('--seed', type=int, default=42, help="random seed for initialization")
     parser.add_argument("--train_batch_size", default=32, type=int, help="Batch size for training.")

@@ -38,13 +38,14 @@ class Trainer(object):
                                                             label2id={label: i for i, label in enumerate(self.label_lst)})
             if args.task == 'naver-ner':
                 self.model = self.model_class.from_pretrained(args.model_name_or_path, config=self.config)
+                if args.load_pretrained:
+                    self.load_pretrained_model()
             else:
                 self.model_class = BertNER
                 self.model = self.model_class.from_pretrained(args.model_name_or_path,
                                                               dataset_label_nums=[len(self.label_lst)],
                                                               output_attentions=False,
                                                               output_hidden_states=False)
-
             # GPU or CPU
             self.device = f"cuda:{args.cuda_number}" if torch.cuda.is_available() and not args.no_cuda else "cpu"
             self.model.to(self.device)
@@ -55,6 +56,22 @@ class Trainer(object):
                 # Empty the original prediction files
                 if os.path.exists(args.pred_dir):
                     shutil.rmtree(args.pred_dir)
+
+    def load_pretrained_model(self):
+        # Check whether model exists
+        if not os.path.exists(self.args.pretrained_model_dir):
+            raise Exception("Model doesn't exists! Train first!")
+        try:
+            pretrained = self.model_class.from_pretrained(self.args.pretrained_model_dir)
+            pretrained_dict = pretrained.state_dict()
+            current_model_dict = self.model.state_dict()
+            pretrained_dict = {k: v for k, v in pretrained_dict.items() if
+                               k in current_model_dict and 'classifier' not in k}
+            current_model_dict.update(pretrained_dict)
+            self.model.load_state_dict(current_model_dict)
+            logger.info("***** Model Loaded *****")
+        except:
+            raise Exception("Some model files might be missing...")
 
     def train(self):
         train_sampler = RandomSampler(self.train_dataset)
